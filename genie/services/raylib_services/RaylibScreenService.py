@@ -1,9 +1,7 @@
-import pyray
+from pyray import *
+from raylib.colors import *
 
 from genie.cast.actor import Actor
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0, 0)
 
 class RaylibScreenService:
     """
@@ -22,14 +20,14 @@ class RaylibScreenService:
     def __init__(self, window_size, title : str = ""):
         # if not pyray.is_window_ready():
         #     print("window initialized!")
-        pyray.init_window(window_size[0], window_size[1], title)
+        init_window(window_size[0], window_size[1], title)
         self._textures_cache = {}
     
     def initialize(self):
         pass
     
     def set_fps(self, fps : int = 60):
-        pyray.set_target_fps(fps)
+        set_target_fps(fps)
 
     def _load_texture(self, actor : Actor):
         """
@@ -38,7 +36,7 @@ class RaylibScreenService:
         """
         image_path = actor.get_path()
         # print("2")
-        texture = pyray.load_texture(image_path)
+        texture = load_texture(image_path)
         
         # put image in cache so we don't have to load again
         if (image_path not in self._textures_cache.keys()):
@@ -57,25 +55,25 @@ class RaylibScreenService:
         """
             Fill the screen with a certain color
         """
-        pyray.clear_background(color)
+        clear_background(color)
 
     def begin_drawing(self):
         """
             What to call before drawing anything in a frame
         """
-        pyray.begin_drawing()
+        begin_drawing()
 
     def update_screen(self):
         """
             Actually putting whatever was drawn on to the screen
         """
-        pyray.end_drawing()
+        end_drawing()
 
     def close_window(self):
-        pyray.close_window()
+        close_window()
 
     def is_quit(self):
-        return pyray.window_should_close()
+        return window_should_close()
 
     # def get_text_image(self):
     #     font = pygame.font.SysFont(font, font_size)
@@ -125,9 +123,9 @@ class RaylibScreenService:
         topleft_x, topleft_y = center[0] - width/2, center[1] - height/2
     
         if border_width == 0:
-            pyray.draw_rectangle_rounded(pyray.Rectangle(topleft_x, topleft_y, width, height), roundness, 60, color)
+            draw_rectangle_rounded(Rectangle(topleft_x, topleft_y, width, height), roundness, 60, color)
         elif border_width > 0:
-            pyray.draw_rectangle_rounded_lines(pyray.Rectangle(topleft_x, topleft_y, width, height), roundness, 60, border_width, color)
+            draw_rectangle_rounded_lines(Rectangle(topleft_x, topleft_y, width, height), roundness, 60, border_width, color)
 
     
     def draw_circle(self, center, radius, color : tuple = (0, 0, 0), width : int = 0,
@@ -147,35 +145,32 @@ class RaylibScreenService:
                     only parts of the circle (top left, top right, bottom left, bottom right)
         """
         if width == 0:
-            pyray.draw_circle(center[0], center[1], radius, color)
+            draw_circle(center[0], center[1], radius, color)
         elif width > 0:
-            equiv_rec = pyray.Rectangle(center[0] - radius, center[1] - radius, 2*radius, 2*radius)
-            pyray.draw_rectangle_rounded_lines(equiv_rec, 1, 60, width, color)
+            equiv_rec = Rectangle(center[0] - radius, center[1] - radius, 2*radius, 2*radius)
+            draw_rectangle_rounded_lines(equiv_rec, 1, 60, width, color)
     
     def draw_actor(self, actor: Actor):
         center = actor.get_position()
         path = actor.get_path()
-        print(center)
-        # try:
+        try:
             # Load image from cache or from file
-            # print("1")
-        texture = self._textures_cache[path] if path in self._textures_cache.keys() else self._load_texture(actor)
-        
-        frame_width = actor.get_width()
-        frame_height = actor.get_height()
+            texture = self._textures_cache[path] if path in self._textures_cache.keys() else self._load_texture(actor)
+            
+            frame_width = actor.get_width()
+            frame_height = actor.get_height()
+            # print(actor.get_rotation())
+            draw_texture_pro(texture,
+                            Rectangle(0,0,texture.width,texture.height),
+                            Rectangle(center[0], center[1], frame_width, frame_height),
+                            Vector2(frame_width/2, frame_height/2),
+                            actor.get_rotation(),
+                            WHITE)
 
-        # print(texture.width, texture.height, center[0], center[1], frame_width, frame_height, actor.get_rotation())
-        # print("1")
-        # pyray.draw_texture(texture, 400, 300, WHITE)
-        # print("2")
-        pyray.draw_texture_pro(texture,
-                                pyray.Rectangle(0,0,texture.width,texture.height),
-                                pyray.Rectangle(center[0], center[1], frame_width, frame_height),
-                                pyray.Vector2(frame_width/2, frame_height/2),
-                                actor.get_rotation(),
-                                WHITE)
-        # except:
-        #     print("something went wrong!")
+            # This line of code when un-commented shows the hit box of the actor
+            # draw_rectangle_lines(int(actor.get_top_left()[0]), int(actor.get_top_left()[1]), int(actor.get_width()), int(actor.get_height()),BLACK)
+        except:
+            print("Something went wrong in RaylibScreenService.draw_actor()! Most likely path not found!")
 
     def draw_actors(self, actors : list, lerp : float = 0):
         """
@@ -186,32 +181,7 @@ class RaylibScreenService:
             lerp: linear interpolation
         """
         for actor in actors:
-            center = actor.get_position()
-            path = actor.get_path()
-            
-            # try:
-                # Load image from cache or from file
-                # print("1")
-            texture = self._textures_cache[path] if path in self._textures_cache.keys() else self._load_texture(actor)
-            print("3")
-            frame_width = actor.get_width()
-            frame_height = actor.get_height()
-
-            pyray.draw_texture_pro(texture,
-                                    pyray.Rectangle(0,0,texture.width,texture.height),
-                                    pyray.Rectangle(center[0], center[1], frame_width, frame_height),
-                                    pyray.Vector2(frame_width/2, frame_height/2),
-                                    actor.get_rotation(),
-                                    WHITE)
-            print("4")
-
-                # The following lines of code when un-comment show the hit box of the actor AND the boundary of the image (the 2 are different)
-                # pyray.draw_rectangle_lines(center[0] - frame_width/2, center[1] - frame_height/2, frame_width, frame_height, BLACK)
-            # except:
-            #     # print("Could not load texture " + path)
-            #     pass
+            self.draw_actor(actor)
         
-        
-
     def release(self):
         pass
