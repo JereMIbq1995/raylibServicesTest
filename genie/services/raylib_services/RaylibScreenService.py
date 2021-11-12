@@ -20,19 +20,24 @@ class RaylibScreenService:
                 use pygame to draw
     """
     def __init__(self, window_size, title : str = ""):
-        if not pyray.is_window_ready():
-            pyray.init_window(window_size[0], window_size[1], title)
+        # if not pyray.is_window_ready():
+        #     print("window initialized!")
+        pyray.init_window(window_size[0], window_size[1], title)
         self._textures_cache = {}
     
     def initialize(self):
         pass
     
+    def set_fps(self, fps : int = 60):
+        pyray.set_target_fps(fps)
+
     def _load_texture(self, actor : Actor):
         """
             Takes in an actor that has 2 traits: Body and Image
                 and load the image of that Actor into the cache
         """
         image_path = actor.get_path()
+        # print("2")
         texture = pyray.load_texture(image_path)
         
         # put image in cache so we don't have to load again
@@ -41,7 +46,7 @@ class RaylibScreenService:
 
         return texture
 
-    def load_images(self, actors : list):
+    def load_textures(self, actors : list):
         """
             load all the images into a dictionary cache
         """
@@ -54,11 +59,23 @@ class RaylibScreenService:
         """
         pyray.clear_background(color)
 
+    def begin_drawing(self):
+        """
+            What to call before drawing anything in a frame
+        """
+        pyray.begin_drawing()
+
     def update_screen(self):
         """
             Actually putting whatever was drawn on to the screen
         """
         pyray.end_drawing()
+
+    def close_window(self):
+        pyray.close_window()
+
+    def is_quit(self):
+        return pyray.window_should_close()
 
     # def get_text_image(self):
     #     font = pygame.font.SysFont(font, font_size)
@@ -84,17 +101,10 @@ class RaylibScreenService:
                         + False: treats the position as the top-left corner of the text image
 
         """
-        font = pygame.font.SysFont(font, font_size)
-        text_image = font.render(text, antialias, color)
-        txt_img_position = position
-        if (position_center):
-            txt_img_position = (position[0] - text_image.get_width()/2, position[1] - text_image.get_height()/2)
-        self._window.blit(text_image, txt_img_position)
+        pass
 
     def draw_rectangle(self, center : tuple, width : int, height: int, color : tuple = (0, 0, 0), 
-                        border_width : int = 0, border_radius : int = 0, border_top_left_radius : int = -1,
-                        border_top_right_radius : int = -1, border_bottom_left_radius : int = -1, 
-                        border_bottom_right_radius : int = -1):
+                        border_width : int = 0, roundness : float = 0):
         """
             Draw a rectangle.
 
@@ -112,8 +122,13 @@ class RaylibScreenService:
                                         + values >= 1 means rounded corners. Increase this
                                             to increase the roundness
         """
+        topleft_x, topleft_y = center[0] - width/2, center[1] - height/2
+    
         if border_width == 0:
-            pyray.draw_rectangle()
+            pyray.draw_rectangle_rounded(pyray.Rectangle(topleft_x, topleft_y, width, height), roundness, 60, color)
+        elif border_width > 0:
+            pyray.draw_rectangle_rounded_lines(pyray.Rectangle(topleft_x, topleft_y, width, height), roundness, 60, border_width, color)
+
     
     def draw_circle(self, center, radius, color : tuple = (0, 0, 0), width : int = 0,
                     draw_top_right : bool = False, draw_top_left : bool = False, draw_bottom_left : bool = False, 
@@ -131,8 +146,37 @@ class RaylibScreenService:
                 - draw_top_..., draw_bottom_...: Boolean. Use these parameters if want to draw
                     only parts of the circle (top left, top right, bottom left, bottom right)
         """
-        pygame.draw.circle(self._window, color, center, radius, width, draw_top_right, draw_top_left, draw_bottom_left, draw_bottom_right)
+        if width == 0:
+            pyray.draw_circle(center[0], center[1], radius, color)
+        elif width > 0:
+            equiv_rec = pyray.Rectangle(center[0] - radius, center[1] - radius, 2*radius, 2*radius)
+            pyray.draw_rectangle_rounded_lines(equiv_rec, 1, 60, width, color)
     
+    def draw_actor(self, actor: Actor):
+        center = actor.get_position()
+        path = actor.get_path()
+        print(center)
+        # try:
+            # Load image from cache or from file
+            # print("1")
+        texture = self._textures_cache[path] if path in self._textures_cache.keys() else self._load_texture(actor)
+        
+        frame_width = actor.get_width()
+        frame_height = actor.get_height()
+
+        # print(texture.width, texture.height, center[0], center[1], frame_width, frame_height, actor.get_rotation())
+        # print("1")
+        # pyray.draw_texture(texture, 400, 300, WHITE)
+        # print("2")
+        pyray.draw_texture_pro(texture,
+                                pyray.Rectangle(0,0,texture.width,texture.height),
+                                pyray.Rectangle(center[0], center[1], frame_width, frame_height),
+                                pyray.Vector2(frame_width/2, frame_height/2),
+                                actor.get_rotation(),
+                                WHITE)
+        # except:
+        #     print("something went wrong!")
+
     def draw_actors(self, actors : list, lerp : float = 0):
         """
             Draw all the actors in the "actors" list in order:
@@ -142,31 +186,30 @@ class RaylibScreenService:
             lerp: linear interpolation
         """
         for actor in actors:
-            actor_topleft = actor.get_top_left()
+            center = actor.get_position()
             path = actor.get_path()
             
-            try:
+            # try:
                 # Load image from cache or from file
-                image = self._images_cache[path] if path in self._images_cache.keys() else self._load_image(actor)
+                # print("1")
+            texture = self._textures_cache[path] if path in self._textures_cache.keys() else self._load_texture(actor)
+            print("3")
+            frame_width = actor.get_width()
+            frame_height = actor.get_height()
 
-                # Ensure that the image rotates when actor._rotation changes or when width and height change
-                transformed_image = pygame.transform.rotate(
-                        pygame.transform.scale(image, (actor.get_width(), actor.get_height())), 
-                        actor.get_rotation())
-                
-                # Shift the image upward and to the left to account for pygame's way to do rotation
-                offset_x = (transformed_image.get_width() - actor.get_width()) / 2
-                offset_y = (transformed_image.get_height() - actor.get_height()) / 2
-                image_topleft = (actor_topleft[0] - offset_x, actor_topleft[1] - offset_y)
-
-                # Draw the image with pygame
-                self._window.blit(transformed_image, image_topleft)
+            pyray.draw_texture_pro(texture,
+                                    pyray.Rectangle(0,0,texture.width,texture.height),
+                                    pyray.Rectangle(center[0], center[1], frame_width, frame_height),
+                                    pyray.Vector2(frame_width/2, frame_height/2),
+                                    actor.get_rotation(),
+                                    WHITE)
+            print("4")
 
                 # The following lines of code when un-comment show the hit box of the actor AND the boundary of the image (the 2 are different)
-                # pygame.draw.rect(self._window, (0,0,0), pygame.Rect(actor_topleft[0], actor_topleft[1], actor.get_width(), actor.get_height()), width = 5)
-                # pygame.draw.rect(self._window, (0,0,0), pygame.Rect(image_topleft[0], image_topleft[1], transformed_image.get_width(), transformed_image.get_height()), width = 5)
-            except:
-                pass
+                # pyray.draw_rectangle_lines(center[0] - frame_width/2, center[1] - frame_height/2, frame_width, frame_height, BLACK)
+            # except:
+            #     # print("Could not load texture " + path)
+            #     pass
         
         
 
