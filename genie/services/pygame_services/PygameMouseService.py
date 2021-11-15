@@ -1,12 +1,12 @@
 import pygame
-from genie.services.constants import mouse
+# from genie.services.constants import mouse
 
 class PygameMouseService:
     def __init__(self):
         if not pygame.get_init():
             pygame.init()
 
-    def is_button_pressed(self, button):
+    def is_button_down(self, button):
         """
             buttons: a tuple of mouse buttons that whoever calls this function
                 wants to check whether is pressed.
@@ -20,7 +20,7 @@ class PygameMouseService:
         return mouse_buttons_state[button]
         
 
-    def is_button_released(self, button):
+    def is_button_up(self, button):
         """
             Similar to is_button_pressed() but give the opposite result
         """

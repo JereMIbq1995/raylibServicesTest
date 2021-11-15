@@ -1,5 +1,5 @@
 import pygame
-from genie.services.constants import keys
+# from .constants import pygame_keys as keys
 
 class PygameKeyboardService():
     def __init__(self):
@@ -36,14 +36,14 @@ class PygameKeyboardService():
         
         return keys_pressed
 
-    def is_key_pressed(self, key):
+    def is_key_down(self, key):
         """
             check to see if a key is pressed. Returns True for pressed and False for released
         """
         keys_state_dict = self.get_keys_state(key)
         return keys_state_dict[key]
     
-    def is_key_released(self, key):
+    def is_key_up(self, key):
         """
             Similar to is_key_pressed, but returns True for released and False for pressed
         """
