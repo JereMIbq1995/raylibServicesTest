@@ -1,10 +1,17 @@
-import pygame
-from genie.services.constants import mouse
+from pyray import *
+# from genie.services.constants import mouse
 
 class RaylibMouseService:
     def __init__(self):
-        if not pygame.get_init():
-            pygame.init()
+        # if not pygame.get_init():
+        #     pygame.init()
+        pass
+    
+    def is_button_down(self, button):
+        return is_mouse_button_down(button)
+    
+    def is_button_up(self, button):
+        return is_mouse_button_up(button)
 
     def is_button_pressed(self, button):
         """
@@ -16,16 +23,18 @@ class RaylibMouseService:
                 The function will return a DICT that maps the key to either True or False,
                     indicating whether the mouse button is pressed or not
         """
-        mouse_buttons_state = pygame.mouse.get_pressed(num_buttons=5)
-        return mouse_buttons_state[button]
+        return is_mouse_button_pressed(button)
+        # mouse_buttons_state = pygame.mouse.get_pressed(num_buttons=5)
+        # return mouse_buttons_state[button]
         
 
     def is_button_released(self, button):
         """
             Similar to is_button_pressed() but give the opposite result
         """
-        mouse_buttons_state = pygame.mouse.get_pressed(num_buttons=5)
-        return (mouse_buttons_state[button] + 1) % 2
+        return is_mouse_button_released(button)
+        # mouse_buttons_state = pygame.mouse.get_pressed(num_buttons=5)
+        # return (mouse_buttons_state[button] + 1) % 2
 
     def has_mouse_moved(self):
         """
@@ -33,15 +42,15 @@ class RaylibMouseService:
             If both x and y movements are 0, then the mouse has not moved.
             Otherwise, the mouse has moved. Return a bool.
         """
-        movement = pygame.mouse.get_rel()
-        if movement[0] == 0 and movement[1] == 0:
-            return False
-        else:
-            return True
+        mouse_delta = get_mouse_delta()
+        return mouse_delta.x > 0 or mouse_delta.y > 0
+    
+    def get_mouse_wheel_move(self):
+        return get_mouse_wheel_move()
 
     def get_current_coordinates(self):
         """
             Simply ask pygame for the position of the mouse and return it
             as a tuple.
         """
-        return pygame.mouse.get_pos()
+        return (get_mouse_x(), get_mouse_y())
