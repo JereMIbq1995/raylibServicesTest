@@ -40,7 +40,7 @@ def main():
             large_astroid.set_vy(0)
         
         if keyboard_service.is_key_pressed(keys.SPACE):
-            audio_service.play_sound("assets/sound/bullet_shot.wav")
+            audio_service.play_sound("assets/sound/bullet_shot.wav", 0.5)
         
 
         # Update
