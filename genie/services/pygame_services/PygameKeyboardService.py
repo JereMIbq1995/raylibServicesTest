@@ -40,7 +40,7 @@ class PygameKeyboardService():
         """
             check to see if a key is pressed. Returns True for pressed and False for released
         """
-        keys_state_dict = self.get_keys_state(keys_map[key])
+        keys_state_dict = self.get_keys_state(key)
         return keys_state_dict[key]
     
     def is_key_up(self, key):

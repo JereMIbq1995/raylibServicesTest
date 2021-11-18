@@ -29,7 +29,7 @@ class RaylibPhysicsService:
             If target doesn't collide with any of the actors, return -1
         """
         for actor in actors:
-            if self._get_rectangle(target).colliderect(self._get_rectangle(actor)):
+            if check_collision_recs( self._get_rectangle(target), self._get_rectangle(actor) ):
                 return actor
         return -1
     
