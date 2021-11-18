@@ -1,5 +1,5 @@
 import pygame
-# from .constants import pygame_keys as keys
+from .constants.keys import keys_map
 
 class PygameKeyboardService():
     def __init__(self):
@@ -32,7 +32,7 @@ class PygameKeyboardService():
         keys_pressed = {}
         keys_state = pygame.key.get_pressed()
         for key in keys:
-            keys_pressed[key] = keys_state[key]
+            keys_pressed[key] = keys_state[keys_map[key]]
         
         return keys_pressed
 
@@ -40,7 +40,7 @@ class PygameKeyboardService():
         """
             check to see if a key is pressed. Returns True for pressed and False for released
         """
-        keys_state_dict = self.get_keys_state(key)
+        keys_state_dict = self.get_keys_state(keys_map[key])
         return keys_state_dict[key]
     
     def is_key_up(self, key):
