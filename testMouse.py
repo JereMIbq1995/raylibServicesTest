@@ -7,8 +7,8 @@ WHITE = (255,255,255,255)
 VEL = 5
 from genie.cast.actor import Actor
 from genie.services import RaylibScreenService
-from genie.services import RaylibKeyboardService, raylib_keys as keys
-from genie.services import RaylibMouseService, raylib_mouse as mouse
+from genie.services import RaylibKeyboardService, keys
+from genie.services import RaylibMouseService, mouse
 
 def main():
     screen_width = 800
