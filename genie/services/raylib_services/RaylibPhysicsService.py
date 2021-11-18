@@ -1,13 +1,12 @@
-import pygame
+from pyray import *
 from genie.cast.actor import Actor
 
 class RaylibPhysicsService:
     def __init__(self):
-        if not pygame.get_init():
-            pygame.init()
+        pass
 
     def _get_rectangle(self, actor: Actor):
-        return pygame.Rect(actor.get_top_left()[0], actor.get_top_left()[1], actor.get_width(), actor.get_height())
+        return Rectangle(actor.get_top_left()[0], actor.get_top_left()[1], actor.get_width(), actor.get_height())
 
     def rotate_actors(self, actors : list):
         for actor in actors:
@@ -19,13 +18,10 @@ class RaylibPhysicsService:
 
     def check_collision(self, actor1 : Actor, actor2 : Actor):
         """
-            - create pygame.Shape
-            - call colliderect
+            - create Rectangle shapes for both actors
+            - call check_collision_recs (for rectangles)
         """
-        return self._get_rectangle(actor1) \
-                .colliderect(
-                self._get_rectangle(actor2)
-                )
+        return check_collision_recs( self._get_rectangle(actor1), self._get_rectangle(actor2) )
     
     def check_collision_list(self, target: Actor, actors: list):
         """

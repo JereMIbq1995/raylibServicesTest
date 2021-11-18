@@ -1,10 +1,8 @@
-import pygame
+from pyray import *
 
 class RaylibAudioService:
     def __init__(self):
-        if not pygame.get_init():
-            pygame.init()
-        pygame.mixer.init()
+        init_audio_device()
         self._sound_cache = {}
 
     def _load_sound(self, path):
@@ -13,7 +11,7 @@ class RaylibAudioService:
             - Store the sound to cache
             - return the sound
         """
-        sound = pygame.mixer.Sound(path)
+        sound = load_sound(path)
         self._sound_cache[path] = sound
         return sound
 
@@ -28,9 +26,9 @@ class RaylibAudioService:
             sound = self._load_sound(path) if path not in self._sound_cache.keys() \
                     else self._sound_cache[path]
             # Set volume
-            sound.set_volume(volume)
+            set_sound_volume(sound, volume)
 
             # Play!
-            sound.play()
+            play_sound(sound)
         except:
             print("Cannot find audio file: ", path)
