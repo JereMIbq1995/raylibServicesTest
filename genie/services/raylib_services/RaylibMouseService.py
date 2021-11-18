@@ -1,5 +1,5 @@
 from pyray import *
-# from genie.services.constants import mouse
+from .constants.mouse import mouse_map
 
 class RaylibMouseService:
     def __init__(self):
@@ -8,10 +8,10 @@ class RaylibMouseService:
         pass
     
     def is_button_down(self, button):
-        return is_mouse_button_down(button)
+        return is_mouse_button_down(mouse_map[button])
     
     def is_button_up(self, button):
-        return is_mouse_button_up(button)
+        return is_mouse_button_up(mouse_map[button])
 
     def is_button_pressed(self, button):
         """
@@ -23,7 +23,7 @@ class RaylibMouseService:
                 The function will return a DICT that maps the key to either True or False,
                     indicating whether the mouse button is pressed or not
         """
-        return is_mouse_button_pressed(button)
+        return is_mouse_button_pressed(mouse_map[button])
         # mouse_buttons_state = pygame.mouse.get_pressed(num_buttons=5)
         # return mouse_buttons_state[button]
         
@@ -32,7 +32,7 @@ class RaylibMouseService:
         """
             Similar to is_button_pressed() but give the opposite result
         """
-        return is_mouse_button_released(button)
+        return is_mouse_button_released(mouse_map[button])
         # mouse_buttons_state = pygame.mouse.get_pressed(num_buttons=5)
         # return (mouse_buttons_state[button] + 1) % 2
 

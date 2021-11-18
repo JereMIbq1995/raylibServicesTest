@@ -1,5 +1,5 @@
 from pyray import *
-# from genie.services.constants import keys
+from .constants.keys import keys_map
 
 class RaylibKeyboardService():
     def __init__(self):
@@ -28,7 +28,7 @@ class RaylibKeyboardService():
         """
         keys_state = {}
         for key in keys:
-            keys_state[key] = is_key_down(key)
+            keys_state[key] = is_key_down(keys_map[key])
         
         return keys_state
 
@@ -36,7 +36,7 @@ class RaylibKeyboardService():
         """
             check to see if a key is pressed. Returns True for pressed and False for released
         """
-        return is_key_pressed(key)
+        return is_key_pressed(keys_map[key])
         # keys_state_dict = self.get_keys_state(key)
         # return keys_state_dict[key]
     
@@ -44,12 +44,12 @@ class RaylibKeyboardService():
         """
             Similar to is_key_pressed, but returns True for released and False for pressed
         """
-        return is_key_released(key)
+        return is_key_released(keys_map[key])
         # keys_state_dict = self.get_keys_state(key)
         # return keys_state_dict[key] ^ 1
     
     def is_key_down(self, key):
-        return is_key_down(key)
+        return is_key_down(keys_map[key])
     
     def is_key_up(self, key):
-        return is_key_up(key)
+        return is_key_up(keys_map[key])
