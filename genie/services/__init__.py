@@ -12,6 +12,7 @@ from .raylib_services.RaylibPhysicsService import RaylibPhysicsService
 
 from .constants import keys
 from .constants import mouse
+from .constants import colors
 
 __all__ = [
     'PygameAudioService',
@@ -27,5 +28,6 @@ __all__ = [
     'RaylibPhysicsService',
     
     'keys',
-    'mouse'
+    'mouse',
+    'colors'
 ]
